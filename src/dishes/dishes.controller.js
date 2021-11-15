@@ -74,15 +74,20 @@ const updateValidation = (req,res,next)=>{
     const newDish = res.locals.newDish
     const oldDish = res.locals.dish
     const {data:{id}} = req.body
-    //console.log(Object.keys(newDish))
-    if(){
-        newDish.id == dishId ?
-         next()
-         :next({
-            status: 400,
-            message: `Dish id does not match route id. Dish: ${newDish.id}, Route: ${dishId}`,
-          })
+    if(id){
+    //console.log(`this is the req.body id ${id}`, `this is the dishId from params ${dishId}`)
+       return newDish.id == dishId ?
+        next()
+        :next({
+           status: 400,
+           message: `Dish id does not match route id. Dish: ${newDish.id}, Route: ${dishId}`,
+         })
     }
+    //console.log("id",dishId)
+    newDish.id = dishId
+    res.locals.newDish = {...newDish};
+    
+    //console.log(`this is the req.body id ${id}`, `this is the dishId from params ${dishId}`)
     next()
 }
 const idValidation = (req,res,next)=>{
@@ -102,6 +107,6 @@ module.exports = {
     list,
     read:[idValidation,read],
     create:[postValidation,create],
-    update:[postValidation,idValidation,updateValidation,update],
+    update:[idValidation,postValidation,updateValidation,update],
 
 }
