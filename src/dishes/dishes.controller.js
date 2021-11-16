@@ -30,16 +30,11 @@ const update = (req,res,next)=>{
     dishes[dishIndex]= newDish
     res.json({data:newDish})
 }
-const postValidation = (req,res,next)=>{
+
+const postPropertiesValidation = (req,res,next)=>{
     const {dishId} = req.params
     const {data:dish} = req.body
-    if(!dish){
-        console.log("supposed to be here")
-        next({
-            status: 400,
-            message: `Dish does not exist: ${dishId}.`,
-          })
-    }
+    
     if(!dish.name){
         next({
             status: 400,
@@ -106,7 +101,7 @@ const idValidation = (req,res,next)=>{
 module.exports = {
     list,
     read:[idValidation,read],
-    create:[postValidation,create],
-    update:[idValidation,postValidation,updateValidation,update],
+    create:[postPropertiesValidation,create],
+    update:[idValidation,postPropertiesValidation,updateValidation,update],
 
 }

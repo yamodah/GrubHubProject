@@ -28,7 +28,7 @@ const update = (req,res,next)=>{
     orders[orderIndex]= newOrder
     res.json({data:newOrder})
 }
-const postValidation = (req,res,next)=>{
+const postPropertiesValidation = (req,res,next)=>{
     const {data:order} = req.body
     if(!order.deliverTo){
         next({
@@ -143,8 +143,8 @@ const destroy = (req,res,next)=>{
 module.exports = {
     list,
     read:[idValidation,read],
-    create:[postValidation,create],
-    update:[idValidation,postValidation,updateValidation,update],
+    create:[postPropertiesValidation,create],
+    update:[idValidation,postPropertiesValidation,updateValidation,update],
     delete:[idValidation,deleteValidation,destroy]
 
 }
