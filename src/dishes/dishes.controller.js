@@ -75,7 +75,7 @@ const updateValidation = (req,res,next)=>{
     const oldDish = res.locals.dish
     const {data:{id}} = req.body
     if(id){
-    //console.log(`this is the req.body id ${id}`, `this is the dishId from params ${dishId}`)
+
        return newDish.id == dishId ?
         next()
         :next({
@@ -83,11 +83,11 @@ const updateValidation = (req,res,next)=>{
            message: `Dish id does not match route id. Dish: ${newDish.id}, Route: ${dishId}`,
          })
     }
-    //console.log("id",dishId)
+
     newDish.id = dishId
     res.locals.newDish = {...newDish};
     
-    //console.log(`this is the req.body id ${id}`, `this is the dishId from params ${dishId}`)
+
     next()
 }
 const idValidation = (req,res,next)=>{
