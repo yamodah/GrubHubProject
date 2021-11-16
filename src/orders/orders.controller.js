@@ -84,38 +84,43 @@ const postPropertiesAreValid = (req, res, next) => {
   res.locals.newOrder = res.locals.orderToCheck;
   next();
 };
- 
-const updateValidation = (req, res, next) => {
-  const { orderId } = req.params;
-  const newOrder = res.locals.newOrder;
-  const oldOrder = res.locals.order;
+const idMatchCheck = (req, res, next) => {
   const { data: order } = req.body;
-
+  const { orderId } = req.params;
+  const newOrder = res.locals.orderToCheck;
   if (order.id) {
     if (newOrder.id != orderId) {
-      next({
+      return next({
         status: 400,
         message: `Order id does not match route id. Order: ${order.id}, Route: ${orderId}.`,
       });
     }
   }
+  next();
+};
+const statusCheck = (req, res, next) => {
+  const order = res.locals.orderToCheck;
   if (!order.status || order.status.length < 1 || order.status === "invalid") {
-    next({
+    return next({
       status: 400,
       message: `Order must have a status of pending, preparing, out-for-delivery, delivered`,
     });
   } else if (order.status === "delivered") {
-    next({
+    return next({
       status: 400,
       message: `A delivered order cannot be changed`,
     });
   }
-
-  newOrder.id = orderId;
-  res.locals.newOrder = { ...newOrder };
-
   next();
 };
+const updateIsValid = (req, res, next) => {
+  const { orderId } = req.params;
+  const newOrder = res.locals.orderToCheck;
+  newOrder.id = orderId;
+  res.locals.newOrder = { ...newOrder };
+  next();
+};
+
 const idValidation = (req, res, next) => {
   const { orderId } = req.params;
 
@@ -170,7 +175,9 @@ module.exports = {
     dishesCheck,
     quantityCheck,
     postPropertiesAreValid,
-    updateValidation,
+    idMatchCheck,
+    statusCheck,
+    updateIsValid,
     update,
   ],
   delete: [idValidation, deleteValidation, destroy],
