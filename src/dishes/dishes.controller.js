@@ -30,38 +30,56 @@ const update = (req,res,next)=>{
     dishes[dishIndex]= newDish
     res.json({data:newDish})
 }
-
-const postPropertiesValidation = (req,res,next)=>{
-    const {dishId} = req.params
+const nameCheck = (req,res,next)=>{
     const {data:dish} = req.body
     
     if(!dish.name){
-        next({
+        return next({
             status: 400,
             message: `Dish must include a name`,
           })
-    }else if(!dish.description){
-        next({
+    }
+    res.locals.dishToValidate = dish
+    next()
+}
+const descriptionCheck = (req,res,next)=>{
+    dish = res.locals.dishToValidate
+    if(!dish.description){
+        return next({
             status: 400,
             message: `Dish must include a description`,
           })
-    }else if (!dish.price){
-        next({
+    }
+    next()
+}
+const priceCheck = (req,res,next)=>{
+    dish = res.locals.dishToValidate
+    if (!dish.price){
+        return next({
             status: 400,
             message: `Dish must include a price`,
           })
     }else if(dish.price<=0||typeof dish.price !=="number"){
-        next({
+        return next({
             status: 400,
             message: `Dish must have a price that is an integer greater than 0`,
           })
-    }else if(!dish.image_url){
+    }
+    next()
+}
+const image_urlCheck = (req,res,next)=>{
+    dish = res.locals.dishToValidate
+    if(!dish.image_url){
         next({
             status: 400,
             message: `Dish must include a image_url`,
           })
     }
-    res.locals.newDish = dish
+    next()
+}
+const postPropertiesAreValid = (req,res,next)=>{
+
+    res.locals.newDish = res.locals.dishToValidate
     next()
 }
 const updateValidation = (req,res,next)=>{
@@ -101,7 +119,7 @@ const idValidation = (req,res,next)=>{
 module.exports = {
     list,
     read:[idValidation,read],
-    create:[postPropertiesValidation,create],
-    update:[idValidation,postPropertiesValidation,updateValidation,update],
+    create:[nameCheck,descriptionCheck,priceCheck,image_urlCheck,postPropertiesAreValid,create],
+    update:[idValidation,nameCheck,descriptionCheck,priceCheck,image_urlCheck,postPropertiesAreValid,updateValidation,update],
 
 }
