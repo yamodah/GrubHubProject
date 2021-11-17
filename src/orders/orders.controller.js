@@ -7,13 +7,13 @@ const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /orders handlers needed to make the tests pass
-const list = (req, res, next) => {
+function list(req, res, next)  {
   res.json({ data: orders });
 };
-const read = (req, res, next) => {
+function read (req, res, next){
   res.json({ data: res.locals.order });
 };
-const create = (req, res, next) => {
+function create(req, res, next) {
   let newId = nextId();
   const newOrder = {
     id: newId,
@@ -22,13 +22,13 @@ const create = (req, res, next) => {
   orders.push(newOrder);
   res.status(201).json({ data: newOrder });
 };
-const update = (req, res, next) => {
+function update(req, res, next){
   const newOrder = res.locals.newOrder;
   const orderIndex = orders.findIndex((order) => order.id == newOrder.id);
   orders[orderIndex] = newOrder;
   res.json({ data: newOrder });
 };
-const deliverToCheck = (req, res, next) => {
+function deliverToCheck(req, res, next) {
   const { data: order } = req.body;
   if (!order.deliverTo) {
     return next({
@@ -39,7 +39,7 @@ const deliverToCheck = (req, res, next) => {
   res.locals.orderToCheck = order;
   next();
 };
-const mobileNumberCheck = (req, res, next) => {
+function mobileNumberCheck(req, res, next){
   const order = res.locals.orderToCheck;
   if (!order.mobileNumber) {
     return next({
@@ -49,7 +49,7 @@ const mobileNumberCheck = (req, res, next) => {
   }
   next();
 };
-const dishesCheck = (req, res, next) => {
+function dishesCheck(req, res, next) {
   const order = res.locals.orderToCheck;
   if (!order.dishes) {
     return next({
@@ -64,7 +64,7 @@ const dishesCheck = (req, res, next) => {
   }
   next();
 };
-const quantityCheck = (req, res, next) => {
+function quantityCheck(req, res, next){
   const order = res.locals.orderToCheck;
   order.dishes.forEach((dish, index) => {
     if (
@@ -80,11 +80,11 @@ const quantityCheck = (req, res, next) => {
   });
   next();
 };
-const postPropertiesAreValid = (req, res, next) => {
+function postPropertiesAreValid (req, res, next) {
   res.locals.newOrder = res.locals.orderToCheck;
   next();
 };
-const idMatchCheck = (req, res, next) => {
+function idMatchCheck (req, res, next) {
   const { data: order } = req.body;
   const { orderId } = req.params;
   const newOrder = res.locals.orderToCheck;
@@ -98,7 +98,7 @@ const idMatchCheck = (req, res, next) => {
   }
   next();
 };
-const statusCheck = (req, res, next) => {
+function statusCheck (req, res, next){
   const order = res.locals.orderToCheck;
   if (!order.status || order.status.length < 1 || order.status === "invalid") {
     return next({
@@ -113,7 +113,7 @@ const statusCheck = (req, res, next) => {
   }
   next();
 };
-const updateIsValid = (req, res, next) => {
+function updateIsValid(req, res, next) {
   const { orderId } = req.params;
   const newOrder = res.locals.orderToCheck;
   newOrder.id = orderId;
@@ -121,7 +121,7 @@ const updateIsValid = (req, res, next) => {
   next();
 };
 
-const idValidation = (req, res, next) => {
+function idValidation (req, res, next) {
   const { orderId } = req.params;
 
   const foundOrder = orders.find((order) => order.id == orderId);
@@ -138,7 +138,7 @@ const idValidation = (req, res, next) => {
     message: `order does not exist: ${orderId}.`,
   });
 };
-const deleteValidation = (req, res, next) => {
+function deleteValidation (req, res, next) {
   const { orderId } = req.params;
   const foundOrder = orders.find((order) => order.id == orderId);
   if (foundOrder.status !== "pending") {
@@ -149,7 +149,7 @@ const deleteValidation = (req, res, next) => {
   }
   next();
 };
-const destroy = (req, res, next) => {
+function destroy (req, res, next) {
   const index = res.locals.index;
   if (index > -1) {
     orders.splice(index, 1);

@@ -9,13 +9,13 @@ const nextId = require("../utils/nextId");
 const { post } = require("./dishes.router");
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
-const list = (req, res, next) => {
+function list (req, res, next) {
   res.json({ data: dishes });
 };
-const read = (req, res, next) => {
+function read (req, res, next){
   res.json({ data: res.locals.dish });
 };
-const create = (req, res, next) => {
+function create (req, res, next) {
   let newId = nextId();
   const newDish = {
     id: newId,
@@ -24,13 +24,13 @@ const create = (req, res, next) => {
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
 };
-const update = (req, res, next) => {
+function update (req, res, next)  {
   const newDish = res.locals.newDish;
   const dishIndex = dishes.findIndex((dish) => dish.id == newDish.id);
   dishes[dishIndex] = newDish;
   res.json({ data: newDish });
 };
-const nameCheck = (req, res, next) => {
+function nameCheck(req, res, next) {
   const { data: dish } = req.body;
 
   if (!dish.name) {
@@ -42,7 +42,7 @@ const nameCheck = (req, res, next) => {
   res.locals.dishToValidate = dish;
   next();
 };
-const descriptionCheck = (req, res, next) => {
+function descriptionCheck (req, res, next){
   const dish = res.locals.dishToValidate;
   if (!dish.description) {
     return next({
@@ -52,7 +52,7 @@ const descriptionCheck = (req, res, next) => {
   }
   next();
 };
-const priceCheck = (req, res, next) => {
+function priceCheck (req, res, next) {
   const dish = res.locals.dishToValidate;
   if (!dish.price) {
     return next({
@@ -67,7 +67,7 @@ const priceCheck = (req, res, next) => {
   }
   next();
 };
-const image_urlCheck = (req, res, next) => {
+function image_urlCheck (req, res, next) {
   const dish = res.locals.dishToValidate;
   if (!dish.image_url) {
     next({
@@ -77,11 +77,11 @@ const image_urlCheck = (req, res, next) => {
   }
   next();
 };
-const postPropertiesAreValid = (req, res, next) => {
+function postPropertiesAreValid (req, res, next)  {
   res.locals.newDish = res.locals.dishToValidate;
   next();
 };
-const updateValidation = (req, res, next) => {
+function updateValidation  (req, res, next) {
   const { dishId } = req.params;
   const newDish = res.locals.newDish;
   const oldDish = res.locals.dish;
@@ -102,7 +102,7 @@ const updateValidation = (req, res, next) => {
 
   next();
 };
-const idValidation = (req, res, next) => {
+function idValidation(req, res, next){
   const { dishId } = req.params;
   const foundDish = dishes.find((dish) => dish.id === dishId);
   if (foundDish) {
