@@ -7,12 +7,15 @@ const orders = require(path.resolve("src/data/orders-data"));
 const nextId = require("../utils/nextId");
 
 // TODO: Implement the /orders handlers needed to make the tests pass
+//lists all dishes from dish array
 function list(req, res, next)  {
   res.json({ data: orders });
 };
+//returns single order from orders array
 function read (req, res, next){
   res.json({ data: res.locals.order });
 };
+//makes a new order assigning an id (stays the same if its present and matching)
 function create(req, res, next) {
   let newId = nextId();
   const newOrder = {
@@ -22,12 +25,15 @@ function create(req, res, next) {
   orders.push(newOrder);
   res.status(201).json({ data: newOrder });
 };
+//changes the order info by finding the order within the orders array
+//and setting it equal to our new order obj
 function update(req, res, next){
   const newOrder = res.locals.newOrder;
   const orderIndex = orders.findIndex((order) => order.id == newOrder.id);
   orders[orderIndex] = newOrder;
   res.json({ data: newOrder });
 };
+//ensures order hasnt been delivered
 function deliverToCheck(req, res, next) {
   const { data: order } = req.body;
   if (!order.deliverTo) {
@@ -39,6 +45,7 @@ function deliverToCheck(req, res, next) {
   res.locals.orderToCheck = order;
   next();
 };
+//mobile number present
 function mobileNumberCheck(req, res, next){
   const order = res.locals.orderToCheck;
   if (!order.mobileNumber) {
@@ -49,6 +56,7 @@ function mobileNumberCheck(req, res, next){
   }
   next();
 };
+//dishes are present and more thatn 0
 function dishesCheck(req, res, next) {
   const order = res.locals.orderToCheck;
   if (!order.dishes) {
@@ -64,6 +72,7 @@ function dishesCheck(req, res, next) {
   }
   next();
 };
+//checks dishes for valid quantity
 function quantityCheck(req, res, next){
   const order = res.locals.orderToCheck;
   order.dishes.forEach((dish, index) => {
@@ -80,10 +89,12 @@ function quantityCheck(req, res, next){
   });
   next();
 };
+//sets new order to the order we just checked
 function postPropertiesAreValid (req, res, next) {
   res.locals.newOrder = res.locals.orderToCheck;
   next();
 };
+//check for matching id in the orders array
 function idMatchCheck (req, res, next) {
   const { data: order } = req.body;
   const { orderId } = req.params;
@@ -98,6 +109,7 @@ function idMatchCheck (req, res, next) {
   }
   next();
 };
+//ensure that status is pending if we are going to change the order
 function statusCheck (req, res, next){
   const order = res.locals.orderToCheck;
   if (!order.status || order.status.length < 1 || order.status === "invalid") {
@@ -113,6 +125,7 @@ function statusCheck (req, res, next){
   }
   next();
 };
+//sets id (only changes if its different form url id)
 function updateIsValid(req, res, next) {
   const { orderId } = req.params;
   const newOrder = res.locals.orderToCheck;
@@ -120,7 +133,7 @@ function updateIsValid(req, res, next) {
   res.locals.newOrder = { ...newOrder };
   next();
 };
-
+//checks for id and sets index (to be used for destroy function)
 function idValidation (req, res, next) {
   const { orderId } = req.params;
 
@@ -138,6 +151,7 @@ function idValidation (req, res, next) {
     message: `order does not exist: ${orderId}.`,
   });
 };
+//ensures the status is pending 
 function deleteValidation (req, res, next) {
   const { orderId } = req.params;
   const foundOrder = orders.find((order) => order.id == orderId);
@@ -149,6 +163,7 @@ function deleteValidation (req, res, next) {
   }
   next();
 };
+//finds the order and splices it out of the original array
 function destroy (req, res, next) {
   const index = res.locals.index;
   if (index > -1) {

@@ -9,12 +9,17 @@ const nextId = require("../utils/nextId");
 const { post } = require("./dishes.router");
 
 // TODO: Implement the /dishes handlers needed to make the tests pass
+
+
+//lists all dishes from dishes array
 function list (req, res, next) {
   res.json({ data: dishes });
 };
+//returns singular dish matching dish id
 function read (req, res, next){
   res.json({ data: res.locals.dish });
 };
+//creates new dish and sets dish id if the dish id is the same nothing will change 
 function create (req, res, next) {
   let newId = nextId();
   const newDish = {
@@ -24,12 +29,14 @@ function create (req, res, next) {
   dishes.push(newDish);
   res.status(201).json({ data: newDish });
 };
+//updates by finding the dish in the array and setting that to the new dish
 function update (req, res, next)  {
   const newDish = res.locals.newDish;
   const dishIndex = dishes.findIndex((dish) => dish.id == newDish.id);
   dishes[dishIndex] = newDish;
   res.json({ data: newDish });
 };
+//checks for valid name
 function nameCheck(req, res, next) {
   const { data: dish } = req.body;
 
@@ -42,6 +49,7 @@ function nameCheck(req, res, next) {
   res.locals.dishToValidate = dish;
   next();
 };
+//checks for valid description
 function descriptionCheck (req, res, next){
   const dish = res.locals.dishToValidate;
   if (!dish.description) {
@@ -52,6 +60,7 @@ function descriptionCheck (req, res, next){
   }
   next();
 };
+//checks for valid price
 function priceCheck (req, res, next) {
   const dish = res.locals.dishToValidate;
   if (!dish.price) {
@@ -67,6 +76,7 @@ function priceCheck (req, res, next) {
   }
   next();
 };
+//checks for url to be present
 function image_urlCheck (req, res, next) {
   const dish = res.locals.dishToValidate;
   if (!dish.image_url) {
@@ -77,10 +87,12 @@ function image_urlCheck (req, res, next) {
   }
   next();
 };
+//sets newdish to the dish we just checked coudl also just be req.body 
 function postPropertiesAreValid (req, res, next)  {
   res.locals.newDish = res.locals.dishToValidate;
   next();
 };
+//checks for id present if it is it must match id in url
 function updateValidation  (req, res, next) {
   const { dishId } = req.params;
   const newDish = res.locals.newDish;
@@ -102,6 +114,7 @@ function updateValidation  (req, res, next) {
 
   next();
 };
+//checks that id is valid in this array
 function idValidation(req, res, next){
   const { dishId } = req.params;
   const foundDish = dishes.find((dish) => dish.id === dishId);
